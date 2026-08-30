@@ -7,16 +7,19 @@ import json
 import os
 
 
+def get_api_key():
+    with open("api_key", "r") as f:
+        api_key = f.read().strip()
+    return api_key
+
 
 def main():
 
     url = "https://api.themoviedb.org/3/authentication"
 
-    with open("api_key", "r") as f:
-        api_key = f.read().strip()
     headers = {
         "accept": "application/json",
-        "Authorization": api_key
+        "Authorization": get_api_key()
     }
 
     response = requests.get(url, headers=headers)
