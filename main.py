@@ -203,16 +203,17 @@ if __name__ == '__main__':
     # b = tom["results"][1]
     # q = rosamund["results"]
 
-    # test_search_rosamund = search_actor("Rosamund+Pike", confidence_val_popularity=5)
-    # test_search_tom = search_actor("Tom+Cruise", confidence_val_popularity=5)
-
-    # test_search_gone_girl = search_movie("Gone Girl")
+    # test_search_rosamund = search_tmdb("Rosamund+Pike", "person", confidence_val_popularity=5)
     # print("\n\n\n")
-    # test_search_mission_impossible = search_movie("Mission Impossible")
+    # test_search_tom = search_tmdb("Tom+Cruise", "person", confidence_val_popularity=5)
 
-    search_tmdb("Tom Cruise", "person")
-    search_tmdb("Mission Impossible", "movie")
+    # test_search_gone_girl = search_tmdb("Gone Girl")
+    # print("\n\n\n")
+    # test_search_mission_impossible = search_tmdb("Mission Impossible")
+
+    # search_tmdb("Tom Cruise", "person")
+    # search_tmdb("Mission Impossible", "movie")
+
 
     print("here")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
