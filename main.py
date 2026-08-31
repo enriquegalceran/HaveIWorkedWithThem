@@ -72,7 +72,7 @@ def authenticate_test():
     print(response.text)
 
 
-def search_actor(query, confidence_val_popularity=5):
+def search_tmdb(query, search_type="movie", confidence_val_popularity=5):
     def print_result_actor(outp):
         print(f"Found ({'F' if outp['gender'] == 1 else 'M' if outp['gender'] == 2 else 'N/A'}) {outp['name']}")
         print(f"Popularity:{outp['popularity']}")
@@ -85,42 +85,6 @@ def search_actor(query, confidence_val_popularity=5):
             score = item['vote_average'] if 'vote_average' in item else 'N/A'
             print(f"  {movie_known_for + 1}. {title} ({media_type}) - Popularity: {pop}, Score: {score}")
 
-    url = BASE_URL + "search/person?query=" + query
-    result = get_tmbd(url)
-    if len(result["results"]) == 0:
-        # Nothing found
-        print(f"No actor found for query: {query}")
-        return None
-    elif len(result["results"]) == 1:
-        # Only one result
-        output = result["results"][0]
-        print_result_actor(output)
-        return output
-
-    # More than one option
-    print(f"Found {len(result['results'])} results for query: {query}. Best result:")
-    names = [_["name"] for _ in result["results"]]
-    popularity = [_["popularity"] for _ in result["results"]]
-    max_pop = max(popularity)
-    idx_max = popularity.index(max_pop)
-    second_max = max([p for p in popularity if p != max_pop], default=0)
-    if max_pop > confidence_val_popularity * second_max:
-        output = result["results"][idx_max]
-        print_result_actor(output)
-        return output
-    else:
-        print(f"Multiple options found for query: {query}. Please select one or refine your search.")
-        for i, name in enumerate(names):
-            print(f"{i + 1}. {name} (Popularity: {popularity[i]})")
-        selection = int(input("Enter the number of the actor you want to select (or '0' to cancel) [0]: ") or "0")
-        if selection == 0:
-            print("Selection cancelled.")
-            return None
-        else:
-            return result["results"][selection - 1]
-
-
-def search_movie(query, confidence_val_popularity=5):
     def print_result_movie(outp):
         print(f"Found movie: {outp['title']} (Release Date: {outp.get('release_date', 'N/A')})")
         print(f"Popularity: {outp['popularity']}")
@@ -128,49 +92,66 @@ def search_movie(query, confidence_val_popularity=5):
         print(f"Original language: {outp.get('original_language', 'N/A')}")
         print(f"Overview: {outp.get('overview', 'N/A')}")
 
-    url = BASE_URL + "search/movie?query=" + query
+    def print_result(outp):
+        if search_type == "movie":
+            print_result_movie(outp)
+        elif search_type == "person":
+            print_result_actor(outp)
+        else:
+            raise NotImplementedError(
+                f"Search type '{search_type}' is not implemented. Please use 'movie' or 'person'.")
+
+    if search_type == "movie":
+        url = BASE_URL + "search/movie?query=" + query
+    elif search_type == "person":
+        url = BASE_URL + "search/person?query=" + query
+    else:
+        raise NotImplementedError(f"Search type '{search_type}' is not implemented. Please use 'movie' or 'person'.")
     result = get_tmbd(url)
+
     if len(result["results"]) == 0:
-        print(f"No movie found for query: {query}")
+        print(f"No {search_type} found for query: {query}")
         return None
     elif len(result["results"]) == 1:
         output = result["results"][0]
-        print_result_movie(output)
+        print_result(output)
         return output
 
-    # More than one option
-    names = [_["title"] for _ in result["results"]]
+    # More than one result
+    names = [_["name"] if search_type == "person" else _["title"] for _ in result["results"]]
     popularity = [_["popularity"] for _ in result["results"]]
     max_pop = max(popularity)
-    idx_max = popularity.index(max_pop)
-    second_max = max([p for p in popularity if p != max_pop], default=0)
     cutoff_popularity = max_pop / confidence_val_popularity
     list_above_cutoff = [result["results"][i] for i, p in enumerate(popularity) if p >= cutoff_popularity]
     list_below_cutoff = [result["results"][i] for i, p in enumerate(popularity) if p < cutoff_popularity]
     more_options = len(list_below_cutoff)
     if len(list_above_cutoff) == 1:
         print(f"Found {len(result['results'])} results for query: {query}. Best result:")
-        output = result["results"][idx_max]
-        print_result_movie(output)
+        output = list_above_cutoff[0]
+        print_result(output)
         return output
 
-    print(f"Multiple options ({len(result['results'])})found for query: {query}. Best options are shown ({len(list_above_cutoff)}). Please select one or refine your search.")
+    print(f"Multiple options ({len(result['results'])}) found for query: {query}. "
+          f"Best options ({len(list_above_cutoff)}) are shown. Please select one or refine your search.")
     dict_with_options = {}
-    for i, possible_movie in enumerate(list_above_cutoff):
-        print(f"\n{i + 1}. {possible_movie['title']} (Popularity: {possible_movie['popularity']})")
-        print_result_movie(possible_movie)
-        dict_with_options[i + 1] = possible_movie
+    for i, possible_result in enumerate(list_above_cutoff):
+        print(f"\n{i + 1}. {possible_result['name'] if search_type == 'person' else possible_result['title']} "
+              f"(Popularity: {possible_result['popularity']})")
+        print_result(possible_result)
+        dict_with_options[i + 1] = possible_result
     if more_options > 0:
-        print(f"\nThere are more ({len(list_below_cutoff)}) options available with lower popularity. Enter '-1' to see them.")
-    selection = int(input("\nEnter the number of the movie you want to select (or '0' to cancel) [0]: ") or "0")
+        print(f"\nThere are more ({len(list_below_cutoff)}) options available with lower popularity. "
+              f"Enter '-1' to see them.")
+    selection = int(input("\nEnter the number of the result you want to select (or '0' to cancel) [0]: ") or "0")
     if selection == -1:
         print(f"\nShowing more options ({len(list_below_cutoff)}):")
-        for i, possible_movie in enumerate(list_below_cutoff):
-            print(f"\n{i + 1 + len(list_above_cutoff)}. {possible_movie['title']} "
-                  f"(Popularity: {possible_movie['popularity']})")
-            print_result_movie(possible_movie)
-            dict_with_options[i + 1 + len(list_above_cutoff)] = possible_movie
-        selection = int(input("\nEnter the number of the movie you want to select (or '0' to cancel) [0]: ") or "0")
+        for i, possible_result in enumerate(list_below_cutoff):
+            print(f"\n{i + 1 + len(list_above_cutoff)}. "
+                  f"{possible_result['name'] if search_type == 'person' else possible_result['title']} "
+                  f"(Popularity: {possible_result['popularity']})")
+            print_result(possible_result)
+            dict_with_options[i + 1 + len(list_above_cutoff)] = possible_result
+        selection = int(input("\nEnter the number of the result you want to select (or '0' to cancel) [0]: ") or "0")
 
     if selection == 0:
         print("Selection cancelled.")
@@ -178,9 +159,12 @@ def search_movie(query, confidence_val_popularity=5):
 
     if selection > 0:
         if selection not in dict_with_options.keys():
-            raise ValueError(f"Invalid selection. Please select a number between 1 and {max(dict_with_options.keys())}.")
+            raise ValueError(
+                f"Invalid selection. Please select a number between 1 and {max(dict_with_options.keys())} (or 0 to cancell, or -1 to show additional options (if applicable)).")
         else:
-            print(f"Selected movie: {dict_with_options[selection]['title']}")
+            name = dict_with_options[selection]['name'] if search_type == 'person' else \
+                dict_with_options[selection]['title']
+            print(f"Selected result: {name}")
             return dict_with_options[selection]
 
 
@@ -222,18 +206,13 @@ if __name__ == '__main__':
     # test_search_rosamund = search_actor("Rosamund+Pike", confidence_val_popularity=5)
     # test_search_tom = search_actor("Tom+Cruise", confidence_val_popularity=5)
 
-    test_search_gone_girl = search_movie("Gone Girl")
-    print("\n\n\n")
-    test_search_mission_impossible = search_movie("Mission Impossible")
+    # test_search_gone_girl = search_movie("Gone Girl")
+    # print("\n\n\n")
+    # test_search_mission_impossible = search_movie("Mission Impossible")
 
-
-
+    search_tmdb("Tom Cruise", "person")
+    search_tmdb("Mission Impossible", "movie")
 
     print("here")
-
-
-
-
-
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
