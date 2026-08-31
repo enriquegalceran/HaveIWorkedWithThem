@@ -16,10 +16,22 @@ def get_api_key():
 TMDB_API_KEY = get_api_key()
 AUTH_HEADER = {"Authorization": TMDB_API_KEY}
 TMDB_CONFIG = json.load(open("tmdb_config.json", "r"))
+print(TMDB_CONFIG)
 BASE_URL = "https://api.themoviedb.org/3/"
 
 
 def get_image(image_path, size="original", savepath=None, filename=None, pltshow=False):
+    """
+    Gets the image and converts it into numpy array.
+    Optionally, saves to disk and shows the image using matplotlib.
+
+    :param image_path:
+    :param size:
+    :param savepath:
+    :param filename:
+    :param pltshow:
+    :return:
+    """
     base_url = TMDB_CONFIG["images"]["secure_base_url"]
     size = size if size in TMDB_CONFIG["images"]["poster_sizes"] else "original"
     image_url = f"{base_url}{size}{image_path}"
@@ -36,20 +48,22 @@ def get_image(image_path, size="original", savepath=None, filename=None, pltshow
         with open(full_path, "wb") as f:
             f.write(image_bytes)
 
+    # Converts raw bytes into image and then converts the image into a numpy array
     img = Image.open(io.BytesIO(image_bytes))
     arr = np.array(img)
+
     if pltshow:
         plt.imshow(arr)
         plt.axis("off")
         plt.show()
-    return arr
 
+    return arr
 
 
 def get_tmbd(url):
     response = requests.get(url, headers=AUTH_HEADER)
     response.raise_for_status()
-    return response
+    return response.json()
 
 
 def authenticate_test():
@@ -85,11 +99,9 @@ if __name__ == '__main__':
 
     test2 = get_tmbd(f"https://api.themoviedb.org/3/person/{id_cast[0]}?append_to_response=movie_credits")
 
-    tomcruise_image = test2["profile_path"]
-
-    tc_image_resp = get_image(tomcruise_image, size="w500", pltshow=True)
-
-    jr_image_resp = get_image(test["poster_path"], size="w500", pltshow=True, filename="jr_poster.jpg")
+    # tomcruise_image = test2["profile_path"]
+    # tc_image_resp = get_image(tomcruise_image, size="w500", pltshow=True)
+    # jr_image_resp = get_image(test["poster_path"], size="w500", pltshow=True, filename="jr_poster.jpg")
 
     print("here")
 
