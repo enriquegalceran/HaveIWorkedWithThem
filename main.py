@@ -5,6 +5,29 @@ import io
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+from collections import Counter
+
+
+def duplicates_set(lst):
+    seen = set()
+    dupes = set()
+    for item in lst:
+        if item in seen:
+            dupes.add(item)
+        else:
+            seen.add(item)
+    return list(dupes)
+
+
+def sort_x_by_y(x, y, reverse_list=False):
+    if reverse_list:
+        return [x for _, x in reversed(sorted(zip(y, x)))]
+    else:
+        return [x for _, x in sorted(zip(y, x))]
+
+
+def flatten_list(xss):
+    return [x for xs in xss for x in xs]
 
 
 def get_api_key():
@@ -169,8 +192,94 @@ def search_tmdb(query, search_type="movie", confidence_val_popularity=5):
 
 
 def get_detail_movie(movie_id):
-    url = BASE_URL + f"movie/{movie_id}"
+    url = BASE_URL + f"movie/{movie_id}?append_to_response=credits&imdb_id&character_names&revenue&budget&created_by"
     return get_tmbd(url)
+
+
+def get_movie_credits(id_movie):
+    return get_tmbd(f"{BASE_URL}movie/{id_movie}?append_to_response=credits")
+
+
+def get_person_filmography(id_person):
+    return get_tmbd(f"{BASE_URL}person/{id_person}?append_to_response=movie_credits")
+
+
+def find_movies_worked_together(actors_id: list = None, actors_names: list = None, only_cast=False):
+    assert actors_id is not None or actors_names is not None, "ids or names need to be given"
+    if actors_id is None and actors_names is not None:
+        raise NotImplementedError("Search within this function not implemented yet.")
+
+    actors_dict = {}
+    actors_dict_movie_ids = {}
+    actors_movies_id = []
+    list_names = [] if actors_names is None else actors_names
+    for actor in actors_id:
+        result = get_person_filmography(actor)
+        actors_dict[result["name"]] = result
+        if actors_names is None:
+            list_names.append(result["name"])
+
+        tmp = {}
+        tmp_avoid_repeat_cast_and_crew = []
+        for job in result["movie_credits"].keys():
+            tmp2 = [_["id"] for _ in result["movie_credits"][job]]
+            tmp[job] = tmp2
+            tmp_avoid_repeat_cast_and_crew += tmp2
+        actors_movies_id.append(list(set(tmp_avoid_repeat_cast_and_crew)))
+        actors_dict_movie_ids[result["name"]] = tmp
+    actors_movies_id_combined = flatten_list(actors_movies_id)
+
+    number_movies = [len(actors_dict_movie_ids[name]["cast"]) + len(actors_dict_movie_ids[name]["crew"]) for name in list_names]
+    shortest_filmography_actor = list_names[number_movies.index(min(number_movies))]
+    actors_movies_id_copy = actors_movies_id_combined.copy()
+    movies_in_both_ids = duplicates_set(actors_movies_id_copy)
+
+    movies_both = []
+    for movie in movies_in_both_ids:
+        if only_cast:
+            idx_shortest = actors_dict_movie_ids[shortest_filmography_actor]["cast"].index(movie)
+            movies_both.append(actors_dict[shortest_filmography_actor]["movie_credits"]["cast"][idx_shortest])
+        else:
+            if movie in actors_dict_movie_ids[shortest_filmography_actor]["cast"]:
+                idx_shortest = actors_dict_movie_ids[shortest_filmography_actor]["cast"].index(movie)
+                movies_both.append(actors_dict[shortest_filmography_actor]["movie_credits"]["cast"][idx_shortest])
+            else:
+                idx_shortest = actors_dict_movie_ids[shortest_filmography_actor]["crew"].index(movie)
+                movies_both.append(actors_dict[shortest_filmography_actor]["movie_credits"]["crew"][idx_shortest])
+
+    name_movies_both = [_["title"] for _ in movies_both]
+    popularity = [_["popularity"] for _ in movies_both]
+    movies_both = sort_x_by_y(movies_both, popularity, reverse_list=True)
+
+    if len(movies_both) == 1:
+        print(f"\nONLY ONE MOVIE! - {movies_both[0]['title']}")
+        result = get_detail_movie(movies_both[0]['id'])
+        return result
+    else:
+        print(f"\nMore than one movie! ({len(movies_both)})")
+        for i, _ in enumerate(movies_both):
+            print(f"{i + 1}. {_['title']} ({_['release_date'][:4]})")
+
+        padding_names = max(max([len(_) for _ in list_names]), 10)
+        print("What did they work as:")
+        print("    " + list_names[0].ljust(padding_names) + "|" + list_names[1].ljust(padding_names))
+        print("    " + "Cast Crew ".ljust(padding_names) + "|" + "Cast Crew ".ljust(padding_names))
+
+        def convert_tuple_to_str(t, pad):
+            if t:
+                return "X".ljust(pad)
+            else:
+                return " ".ljust(pad)
+        for i, mov in enumerate(movies_both):
+            actor_credit = []
+            for act in list_names:
+                actor_credit.append((mov["id"] in actors_dict_movie_ids[act]["cast"], mov["id"] in actors_dict_movie_ids[act]["crew"]))
+            actor_strings = " |".join(["".join(list((convert_tuple_to_str(_, 5) for _ in x))) for x in actor_credit])
+            out_str = f"{i + 1:2}. {actor_strings}"
+            print(out_str)
+
+        return name_movies_both
+
 
 
 # Press the green button in the gutter to run the script.
@@ -211,8 +320,14 @@ if __name__ == '__main__':
     # print("\n\n\n")
     # test_search_mission_impossible = search_tmdb("Mission Impossible")
 
-    # search_tmdb("Tom Cruise", "person")
-    # search_tmdb("Mission Impossible", "movie")
+    # tom = search_tmdb("Tom Cruise", "person")
+    # rosamund = search_tmdb("Rosamund Pike", "person")
+    # q = find_movies_worked_together([tom["id"], rosamund["id"]])
+
+    matt_damon = search_tmdb("Matt Damon", "person")
+    ben_affleck = search_tmdb("Ben Affleck", "person")
+    q = find_movies_worked_together([matt_damon["id"], ben_affleck["id"]])
+
 
 
     print("here")
