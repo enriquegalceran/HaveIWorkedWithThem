@@ -98,7 +98,7 @@ def authenticate_test():
 def search_tmdb(query, search_type="movie", confidence_val_popularity=5):
     def print_result_actor(outp):
         print(f"Found ({'F' if outp['gender'] == 1 else 'M' if outp['gender'] == 2 else 'N/A'}) {outp['name']}")
-        print(f"Popularity:{outp['popularity']}")
+        print(f"Popularity: {outp['popularity']}")
         print(f"Known for:")
         for movie_known_for in range(len(outp['known_for'])):
             item = outp['known_for'][movie_known_for]
@@ -324,9 +324,13 @@ if __name__ == '__main__':
     # rosamund = search_tmdb("Rosamund Pike", "person")
     # q = find_movies_worked_together([tom["id"], rosamund["id"]])
 
-    matt_damon = search_tmdb("Matt Damon", "person")
-    ben_affleck = search_tmdb("Ben Affleck", "person")
-    q = find_movies_worked_together([matt_damon["id"], ben_affleck["id"]])
+    # matt_damon = search_tmdb("Matt Damon", "person")
+    # ben_affleck = search_tmdb("Ben Affleck", "person")
+    actor1 = search_tmdb("Tom Holland", "person")
+    actor2 = search_tmdb("Zendaya", "person")
+    q = find_movies_worked_together([actor1["id"], actor2["id"]])
+
+
 
 
 

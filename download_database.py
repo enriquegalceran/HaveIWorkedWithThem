@@ -11,8 +11,7 @@ def get_person_export(date=None, filename=None, overwrite=True):
     """
 
     if filename is not None:
-        if not filename.endswith(".json"):
-            raise ValueError("filename must end with .json")
+        assert filename.endswith(".pkl"), "filename must end with .pkl"
         if os.path.exists(filename) and not overwrite:
             people = pickle.load(open(filename, "rb"))
             return people
