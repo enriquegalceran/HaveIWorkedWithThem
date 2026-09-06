@@ -127,17 +127,32 @@ def compress_movies(movies=None, filename=None):
     print("Compressed and saved titles, ids, and popularity to .npy files.")
 
 
+def load_names(filename):
+    with open(filename, "rb") as f:
+        names = [line.decode("utf-8").strip() for line in f.readlines()]
+    return names
+
+
 def main():
     # people = get_person_export(filename="person_ids.pkl", overwrite=False)
     # compress_people(people=people, filename="person_ids.pkl")
     # print(len(people), people[0])
     # print("here")
 
-    movies = get_movie_export(filename="movie_ids.pkl", overwrite=False)
-    compress_movies(movies=movies, filename="movie_ids.pkl")
-    print(len(movies), movies[0])
+    # movies = get_movie_export(filename="movie_ids.pkl", overwrite=False)
+    # compress_movies(movies=movies, filename="movie_ids.pkl")
+    # print(len(movies), movies[0])
     # e.g. 987654 {'id': 238, 'original_title': 'The Godfather', 'popularity': 45.2, 'video': False, 'adult': False}
-    print("here2")
+    # print("here2")
+
+    n = load_names("person_ids_names.lstb")
+    paula = "Paula Freijeiro"
+    k = n.index(paula)
+    id_p = np.load("person_ids_ids.npy")[k]
+    from main import get_person_filmography
+    p = get_person_filmography(id_p)
+
+    print("here3")
 
 if __name__ == "__main__":
     main()

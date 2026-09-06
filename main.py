@@ -201,7 +201,7 @@ def get_movie_credits(id_movie):
 
 
 def get_person_filmography(id_person):
-    return get_tmbd(f"{BASE_URL}person/{id_person}?append_to_response=movie_credits")
+    return get_tmbd(f"{BASE_URL}person/{id_person}?append_to_response=movie_credits&known_for")
 
 
 def find_movies_worked_together(actors_id: list = None, actors_names: list = None, only_cast=False):
