@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Have I Worked With Them Before?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="page">
+
+    <header class="masthead">
+      <h1>🎬 Have I Worked With Them Before?</h1>
+      <p class="masthead-sub">Have these two actors already worked together before?</p>
+    </header>
+
+    <section class="actor-search">
+      <label class="actor-label" for="actor1-input">Actor 1</label>
+      <div class="actor-search-row">
+        <div class="search-input-wrap">
+          <input
+            type="text"
+            id="actor1-input"
+            placeholder="Search for a person…"
+            autocomplete="off"
+          >
+          <ul class="suggestions" id="actor1-suggestions" hidden></ul>
+        </div>
+        <div class="actor-id-badge" id="actor1-id">—</div>
+      </div>
+      <label class="cast-only-toggle">
+        <input type="checkbox" id="actor1-cast-only">
+        Only cast (exclude crew credits)
+      </label>
+    </section>
+
+    <section class="actor-search">
+      <label class="actor-label" for="actor2-input">Actor 2</label>
+      <div class="actor-search-row">
+        <div class="search-input-wrap">
+          <input
+            type="text"
+            id="actor2-input"
+            placeholder="Search for a person…"
+            autocomplete="off"
+          >
+          <ul class="suggestions" id="actor2-suggestions" hidden></ul>
+        </div>
+        <div class="actor-id-badge" id="actor2-id">—</div>
+      </div>
+      <label class="cast-only-toggle">
+        <input type="checkbox" id="actor2-cast-only">
+        Only cast (exclude crew credits)
+      </label>
+    </section>
+
+    <section class="command-block">
+      <button type="button" class="primary-button" id="run-command-btn">Search</button>
+      <p class="command-output" id="command-output"></p>
+    </section>
+
+    <section class="actor-profiles">
+      <div class="actor-profile" id="actor1-profile" hidden></div>
+      <div class="actor-profile" id="actor2-profile" hidden></div>
+    </section>
+
+    <section class="shared-movies-block" id="shared-movies-block" hidden>
+      <h3 class="profile-name" id="shared-movies-title">Movies with both actors</h3>
+      <div class="movie-grid" id="shared-movies-grid"></div>
+    </section>
+
+  </main>
+
+  <script src="js/npy.js"></script>
+  <script src="js/autocomplete.js"></script>
+  <script src="js/tmdb.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

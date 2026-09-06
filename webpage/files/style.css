@@ -1,0 +1,476 @@
+:root {
+  --paper: #EFEFEA;
+  --ink: #1B2430;
+  --ink-soft: #565F6B;
+  --teal: #2C6E63;
+  --teal-dark: #1F4F47;
+  --amber: #C98A2C;
+  --rule: #D7D3C7;
+  --card: #F7F6F2;
+
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 6rem;
+}
+
+/* Masthead */
+
+.masthead {
+  margin-bottom: 2.5rem;
+}
+
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 2.5rem;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.01em;
+}
+
+.masthead-sub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+/* Actor search rows */
+
+.actor-search {
+  margin-bottom: 1.4rem;
+}
+
+.cast-only-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.cast-only-toggle input[type="checkbox"] {
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+.actor-label {
+  display: block;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+}
+
+.actor-search-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.actor-search-row input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-family: var(--sans);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.actor-search-row input:focus-visible {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(44, 110, 99, 0.15);
+}
+
+.actor-id-badge {
+  min-width: 84px;
+  padding: 0.85rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.actor-id-badge.has-value {
+  color: var(--teal-dark);
+  border-color: var(--teal);
+  font-weight: 600;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-wrap input {
+  width: 100%;
+}
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(27, 36, 48, 0.08);
+  z-index: 10;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.suggestions li {
+  padding: 0.55rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.suggestions li .suggestion-id {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.suggestions li:hover,
+.suggestions li[aria-selected="true"] {
+  background: rgba(44, 110, 99, 0.1);
+}
+
+.suggestions .suggestions-status {
+  padding: 0.55rem 0.7rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+/* Command button */
+
+.command-block {
+  margin-bottom: 2.5rem;
+}
+
+.primary-button {
+  padding: 0.85rem 1.4rem;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
+  background: var(--teal);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary-button:hover { background: var(--teal-dark); }
+
+.primary-button:focus-visible {
+  outline: 2px solid var(--teal-dark);
+  outline-offset: 2px;
+}
+
+.command-output {
+  margin: 0.9rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* Actor profiles */
+
+.actor-profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.actor-profile {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.3rem 1.4rem;
+}
+
+.profile-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.profile-photo {
+  width: 84px;
+  height: 84px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
+.profile-photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 0.3rem;
+}
+
+.profile-name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.35rem;
+  margin: 0 0 0.3rem;
+}
+
+.profile-name-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-name-link:hover .profile-name,
+.profile-name-link:focus-visible .profile-name {
+  color: var(--teal-dark);
+}
+
+.profile-name-link:focus-visible {
+  outline: 2px solid var(--teal-dark);
+  outline-offset: 2px;
+}
+
+.profile-popularity {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.profile-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.9rem;
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+}
+
+.profile-meta dt {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.profile-meta dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.profile-bio {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0 0 1.2rem;
+}
+
+.profile-movies-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.7rem;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.9rem;
+}
+
+.movie-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.movie-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 230px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.75rem 0.85rem;
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(27, 36, 48, 0.3);
+  z-index: 30;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.movie-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--ink);
+}
+
+.movie-card:hover .movie-tooltip,
+.movie-card:focus-within .movie-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip-ages {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--amber);
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-line {
+  font-size: 0.75rem;
+  color: rgba(239, 239, 234, 0.85);
+  margin: 0 0 0.3rem;
+}
+
+.tooltip-overview {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--paper);
+  margin: 0.3rem 0 0;
+}
+
+.poster-link {
+  display: block;
+  border-radius: 5px;
+  transition: opacity 0.15s ease;
+}
+
+.poster-link:hover,
+.poster-link:focus-visible {
+  opacity: 0.8;
+}
+
+.poster-link:focus-visible {
+  outline: 2px solid var(--teal-dark);
+  outline-offset: 2px;
+}
+
+.movie-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid var(--rule);
+  margin-bottom: 0.4rem;
+}
+
+.movie-poster-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 0.3rem;
+}
+
+.movie-title {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 0 0 0.15rem;
+  line-height: 1.3;
+}
+
+.movie-director {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* Shared movies block */
+
+.shared-movies-block {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--amber);
+  border-radius: 8px;
+  padding: 1.3rem 1.4rem;
+  margin-bottom: 2.5rem;
+}
+
+.shared-movies-block .profile-name {
+  margin-bottom: 1rem;
+}
+
+/* Section titles */
+
+.section-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .page { padding: 2.5rem 1.25rem 4rem; }
+  .masthead h1 { font-size: 2.1rem; }
+  .actor-search-row { flex-direction: column; }
+  .actor-id-badge { text-align: left; }
+}
